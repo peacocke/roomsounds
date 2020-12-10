@@ -2,32 +2,49 @@
 # Joshua Peacocke
 # This recieves the information from the Raspberry Pi and takes it be played
 # from selecting various songs
-
-from pygame import mixer
+import pygame
+import random
 # TEMPORARY INPUTS
-tags = ['sun', 'afternoon']
-song = 'Signs-Of-Love.wav'
-mixer.init()
-mixer.music.load("music/" + song)
-mixer.music.set_volume(1)
-mixer.music.play()
 
-while True:
 
-    print("Press 'p' to pause, 'r' to resume")
-    print("Press 'e' to exit the program")
-    query = input("  ")
+class Playlist:
+    def __init__(self, tags, songs):
+        self.tags = tags
+        self.songs = songs
 
-    if query == 'p':
 
-        # Pausing the music
-        mixer.music.pause()
-    elif query == 'r':
+class Player:
+    def __init__(self):
+        self.MUSIC_END = pygame.USEREVENT + 1
+        self.current_song = None
+        pygame.init()
+        pygame.mixer.music.set_endevent(self.MUSIC_END)
+        pygame.mixer.music.set_volume(1)
 
-        # Resuming the music
-        mixer.music.unpause()
-    elif query == 'e':
+    def decide_playlist(self):
+        for playlist in total_songs:
+            if (tags[0] in playlist.tags) and (tags[1] in playlist.tags):
+                return playlist
 
-        # Stop the mixer
-        mixer.music.stop()
-        break
+    def load_music(self, current_song):
+        playlist = self.decide_playlist()
+        song = None
+        while self.current_song == song:
+            song = random.choice(playlist.songs)
+        current_song = song
+        print('playing ' + song)
+        pygame.mixer.music.load('music/' + song)
+        pygame.mixer.music.play()
+    def running(self):
+        while True:
+            
+
+# TEMPORARY INPUTS
+
+
+total_songs = [Playlist(['sun', 'afternoon'], ['Signs-Of-Love.wav']),
+               Playlist(['rain', 'afternoon'], ['Beneath-The-Mask.wav']),
+               Playlist(['sun', 'rain', 'night'], ['Iwatodai-Station.wav'])]
+tags = ['rain', 'night']
+roomsounds = Player()
+roomsounds.load_music(tags)
