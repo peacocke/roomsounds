@@ -2,78 +2,108 @@
 # Joshua Peacocke
 # This recieves the information from the Raspberry Pi and takes it be played
 # from selecting various songs
+
+# import library pygame for playing music and random for playlist shuffling
+# for rounding
+from math import floor
+# Using player from pygame as well as the event functions
 import pygame
+# Shuffling playlists
 import random
-# TEMPORARY INPUTS
+# getting local time
+import time
 
 
-class Playlist:
-    def __init__(self, tags, songs):
-        self.tags = tags
-        self.songs = songs
+# Creates a class for songs with their attached tags
+class Song:
+    def __init__(self, tag, name):
+        # Assign the tags and song name
+        self.tags = tag
+        self.name = name
 
 
+# The main player
 class Player:
     def __init__(self):
+        # Create an event when music ends
         self.MUSIC_END = pygame.USEREVENT + 1
+        # Set variable current song to none
         self.current_song = None
+        # Start up pygame and the mixer
         pygame.init()
         pygame.mixer.music.set_volume(1)
 
-    def decide_playlist(self):
-        for playlist in total_songs:
-            if (tags[0] in playlist.tags) and (tags[1] in playlist.tags):
-                return playlist
-
     def load_music(self):
-        playlist = self.decide_playlist()
-        song = self.current_song
-        while self.current_song == song:
-            song = random.choice(playlist.songs)
+        # Create the list of songs to be chosen from
+        playlist = decide_playlist()
+        # as long as more than one song is in play
+        if len(playlist) > 1:
+            # Ensure that the next coming song is not the same as the current
+            song = self.current_song
+            # Until a differnent song is chosen, keep choosing
+            while self.current_song == song:
+                song = random.choice(playlist)
+        else:
+            # Otherwise next song is the same
+            song = playlist[0]
+        # Change to a new current song
         self.current_song = song
+        # Create an event when music ends
         pygame.mixer.music.set_endevent(self.MUSIC_END)
+        # Put in the new song to be played
         pygame.mixer.music.load('music/' + song)
         pygame.mixer.music.play()
         print("CURRENTLY PLAYING " + self.current_song)
         self.running()
 
+# while the player is running, detect when music stopped
     def running(self):
         while True:
-            print("p for pause, r for resume, e for exit")
-            print("t to change tags")
-            query = input("")
-            if query == 'p':
-                pygame.mixer.music.pause()
-                print("PAUSED")
-            elif query == 'r':
-                pygame.mixer.music.unpause()
-                print("RESUMED")
-            elif query == 'e':
-                pygame.mixer.music.stop()
-                print("EXITING...")
-                break
-            elif query == 't':
-                change_tags()
             for event in pygame.event.get():
+                # Load the next song once MUSIC END event is triggered
                 if event.type == self.MUSIC_END:
                     print("Music ended")
                     self.load_music()
 
 
-            
-
 # TEMPORARY INPUTS
+total_songs = [Song(['sun', 'afternoon', 'lunchtime'], 'Signs-Of-Love.wav'),
+               Song(['rain', 'night'], 'Beneath-the-Mask.wav'),
+               Song(['sun', 'rain', 'night', 'afternoon'], 'Iwatodai-Station.wav')]
 
 
-total_songs = [Playlist(['sun', 'afternoon'], ['Signs-Of-Love.wav']),
-               Playlist(['rain', 'afternoon'], ['Beneath-The-Mask.wav']),
-               Playlist(['sun', 'rain', 'night'], ['Iwatodai-Station.wav'])]
-tags = ['rain', 'night']
+# How a playlist is made based on tags
+def decide_playlist():
+    playlist = []
+    # For each song in the list
+    for song in total_songs:
+        # If all the tags made are in the tags for a song, add to the list
+        if all(tags in song.tags for tags in tag_define()):
+            print('added' + song.name)
+            playlist.append(song.name)
+    print(playlist)
+    return playlist
 
 
-def change_tags():
-    global tags
-    tags = [input("enter first tag"), input("input second tag")]
+def tag_define():
+    new_tags = []
+    # Time tag
+    # Find current local hour, split into 3 hour chunks
+    # 0000 to 0300 = 0, 0300 to 0600 = 1, 0600 to 0900 = 2
+    # 0900 to 1200 = 3, 1200 to 1500 = 4, 1500 to 1800 = 5
+    # 1800 to 2100 = 6, 2100 to 2400 = 7
+    current_hour = floor(time.localtime().tm_hour / 3)
+    time_tag = {0: 'late night',
+                1: 'late night',
+                2: 'early morning',
+                3: 'morning',
+                4: 'lunchtime',
+                5: 'afternoon',
+                6: 'night',
+                7: 'late night'}[current_hour]
+    new_tags.append(time_tag)
+    print(new_tags)
+    return new_tags
 
 
 roomsounds = Player()
