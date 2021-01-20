@@ -18,7 +18,7 @@ import time
 class Song:
     def __init__(self, tag, name):
         # Assign the tags and song name
-        self.tags = tag
+        self.tags = tagrasp
         self.name = name
 
 
