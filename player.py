@@ -20,7 +20,7 @@ print("Song addition, files must be in .ogg format to play")
 class Song:
     def __init__(self, name, tag):
         # Assign the tags and song name
-        self.tags = tag
+        self.tags = tagrasp
         self.name = name
 
 
