@@ -14,13 +14,14 @@ import random
 import time
 # to load prepared songs
 import pickle
-
+# GPIO support for Raspberry PI
+from GPIO import Button, Input_Device
 print("Song addition, files must be in .ogg format to play")
 # Creates a class for songs with their attached tags
 class Song:
-    def __init__(self, name, tag):
+    def __init__(self, name, taglist):
         # Assign the tags and song name
-        self.tags = tagrasp
+        self.tags = taglist
         self.name = name
 
 
@@ -61,12 +62,14 @@ class Player:
 
 # while the player is running, detect when music stopped
     def running(self):
-        while True:
+        song_running = True
+        while song_running and reed.is_pressed:
             for event in pygame.event.get():
                 # Load the next song once MUSIC END event is triggered
                 if event.type == self.MUSIC_END:
                     print("Music ended")
                     self.load_music()
+		    song_running = False
 
 
 # TEMPORARY INPUTS
@@ -104,14 +107,24 @@ def tag_define():
                 6: 'night',
                 7: 'late night'}[current_hour]
     new_tags.append(time_tag)
-    weather_tag = input("Is it raining or sunny?")
-    new_tags.append(weather_tag)
-    print(new_tags)
     return new_tags
+
+def pressed():
+    print("pressed")
+    pressed = True
+    roomsounds.load_music()
+
+def released():
+    print("released")
+    pressed = False
+    pygame.mixer.music.stop()
 
 if __name__ == "__main__":
     song_file = open('song_pickle','rb')
     total_songs = pickle.load(song_file)
     for song in total_songs: print(song.name)
+    reed = Button(4,pull_up = False)
+    rain = InputDevice(18)
     roomsounds = Player()
-    roomsounds.load_music()
+    reed.when_pressed = pressed
+    reed.when_release = released

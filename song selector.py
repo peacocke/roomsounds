@@ -2,7 +2,8 @@ from tkinter import filedialog
 import tkinter as tk
 import pickle as pkl
 from player import Song
-import glob, os
+import glob
+import os
 try:
     song_file = open('song_pickle', 'rb')
     song_list = pkl.load(song_file)
