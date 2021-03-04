@@ -4,7 +4,7 @@
 # from selecting various songs
 
 # import library pygame for playing music and random for playlist shuffling
-# for rounding
+# math for rounding, and pickle for loading in songs
 from math import floor
 # Using player from pygame as well as the event functions
 import pygame
@@ -12,11 +12,13 @@ import pygame
 import random
 # getting local time
 import time
+# to load prepared songs
+import pickle
 
-
+print("Song addition, files must be in .ogg format to play")
 # Creates a class for songs with their attached tags
 class Song:
-    def __init__(self, tag, name):
+    def __init__(self, name, tag):
         # Assign the tags and song name
         self.tags = tagrasp
         self.name = name
@@ -51,6 +53,7 @@ class Player:
         # Create an event when music ends
         pygame.mixer.music.set_endevent(self.MUSIC_END)
         # Put in the new song to be played
+        print(song)
         pygame.mixer.music.load('music/' + song)
         pygame.mixer.music.play()
         print("CURRENTLY PLAYING " + self.current_song)
@@ -67,18 +70,17 @@ class Player:
 
 
 # TEMPORARY INPUTS
-total_songs = [Song(['sun', 'afternoon', 'lunchtime'], 'Signs-Of-Love.wav'),
-               Song(['rain', 'night'], 'Beneath-the-Mask.wav'),
-               Song(['sun', 'rain', 'night', 'afternoon'], 'Iwatodai-Station.wav')]
+
 
 
 # How a playlist is made based on tags
 def decide_playlist():
     playlist = []
+    tag_list = tag_define()
     # For each song in the list
     for song in total_songs:
         # If all the tags made are in the tags for a song, add to the list
-        if all(tags in song.tags for tags in tag_define()):
+        if all(tags in song.tags for tags in tag_list):
             print('added' + song.name)
             playlist.append(song.name)
     print(playlist)
@@ -102,9 +104,14 @@ def tag_define():
                 6: 'night',
                 7: 'late night'}[current_hour]
     new_tags.append(time_tag)
+    weather_tag = input("Is it raining or sunny?")
+    new_tags.append(weather_tag)
     print(new_tags)
     return new_tags
 
-
-roomsounds = Player()
-roomsounds.load_music()
+if __name__ == "__main__":
+    song_file = open('song_pickle','rb')
+    total_songs = pickle.load(song_file)
+    for song in total_songs: print(song.name)
+    roomsounds = Player()
+    roomsounds.load_music()
